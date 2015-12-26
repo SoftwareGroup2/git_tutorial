@@ -19,4 +19,4 @@ $(PROGRAM): $(OBJS)
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f *.o $(ALL)
+	rm -f *.o $(PROGRAM)
