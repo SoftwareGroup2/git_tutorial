@@ -1,6 +1,11 @@
 CC=gcc
 
-LFLAGS=-lncurses
+# 環境によってMakefileを書き換える部分
+# ifeq(\$(SO),Windows_NT)
+# LFLAGS=-lncurses
+# else
+# UNAME=(\$(UNAME),Linux)
+LFLAGS=-lncursesw
 CFLAGS=
 
 PROGRAM=test_win
