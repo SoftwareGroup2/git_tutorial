@@ -1,14 +1,15 @@
 CC=gcc
 
-LFLAGS=-lncurses
+LFLAGS=-lncursesw
 CFLAGS=
 
-PROGRAM=test_win
-OBJS=test_win.o
+PROGRAM=test_window
+OBJS=test_window.o
 
 all: $(PROGRAM) sample_win
 
 $(PROGRAM): $(OBJS)
+	LANG=ja-JP.utf-8
 	$(CC) -o $(PROGRAM) $^ $(LFLAGS)
 
 sample_win: sample_win.o
