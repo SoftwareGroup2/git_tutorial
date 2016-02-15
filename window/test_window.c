@@ -3,6 +3,14 @@
 #include <string.h>
 #include <stdio.h>
 
+typedef struct trout_t{
+  char content[200];
+  int enhance_p;
+  int task_p;
+  int money_p;
+  int move_day;
+}TROUT_T;
+
 typedef struct player_t{
   char name[100]; // 
   int grade;              // 学年
@@ -12,6 +20,7 @@ typedef struct player_t{
   int task_p;             // 課題ポイント
   int money_p;            // 金
   int day;                // 現在何日目か
+  TROUT_T calender[44];
 }PLAYER_T;
 
 void set(PLAYER_T p[])
@@ -19,13 +28,13 @@ void set(PLAYER_T p[])
   int i;
 
   for(i=0;i<4;i++){
-    sprintf(p[i].name,"aaaaaaaaaa");
+    sprintf(p[i].name,"aaaaa");
     p[i].grade = 1;
     p[i].club  = 1;
     p[i].girlfriend = 0;
     p[i].enhance_p = 99999;
     p[i].task_p = 99999;
-    p[i].money_p = 99999;
+    p[i].money_p = 999999;
     p[i].day = 1;
   }
 }
@@ -86,17 +95,17 @@ void create_info(WINDOW *win,int y,int x,PLAYER_T p[])
   int month,day;
   char club[10],girl[10];
 
-  mvwaddstr(win,1,1,"No | 名前       | 日付 | 所持金 充実p 課題p | 学年 部活 | 彼女 |");
-  mvwaddstr(win,2,1,"---+------------+------+--------------------+-----------+------+");
+  mvwaddstr(win,1,1,"No | 名前             | 日付 | 所持金 充実p 課題p | 学年 部活 | 彼女 |");
+  mvwaddstr(win,2,1,"---+------------------+------+--------------------+-----------+------+");
   
   for(i=0;i<4;i++){
     //月と日
-    if(p[i].day/31 == 0){
+    if(p[i].day-13 <= 0){
       month = 7;
-      day = 20+(p[i].day-1);
+      day = 19+(p[i].day-1);
     }else{
       month = 8;
-      day = p[i].day-4;
+      day = p[i].day-13;
     }
 
     //部活
@@ -115,8 +124,37 @@ void create_info(WINDOW *win,int y,int x,PLAYER_T p[])
       sprintf(girl,"なし");
     }
     
-      mvwprintw(win,3+i,1,"(%d)| %10s | %d/%2d | %6d %5d %5d | %4d %4s | %4s |",i+1,p[i].name,month,day,p[i].money_p,p[i].enhance_p,p[i].task_p,p[i].grade,club,girl); 
+    mvwprintw(win,3+i,1,"(%d)| %s",i+1,p[i].name);
+    mvwprintw(win,3+i,23,"| %d/%2d | %6d %5d %5d | %4d %4s | %4s |",month,day,p[i].money_p,p[i].enhance_p,p[i].task_p,p[i].grade,club,girl); 
   }
+}
+
+void create_ive(WINDOW *win,int y,int x,PLAYER_T p)
+{
+  WINDOW *msg;
+  int i,month,day;
+  
+  //月と日
+  if(p.day-13 <= 0){
+    month = 7;
+    day = 19+(p.day-1);
+  }else{
+    month = 8;
+    day = p.day-13;
+  }
+
+  mvwprintw(win,1,18,"[%2d/%2dの予定]",month,day); 
+  
+  msg = subwin(win,17,48,4,51);
+  wclear(msg);
+  mvwprintw(msg,1,1,"%s",p.calender[p.day].content);
+  wrefresh(msg);
+
+  mvwprintw(win,19,1,"================================================"); 
+  mvwprintw(win,20,1,"    充実p : %6d",p.calender[p.day].enhance_p); 
+  mvwprintw(win,21,1,"    課題p : %6d",p.calender[p.day].task_p); 
+  mvwprintw(win,22,1,"   所持金 : %6d",p.calender[p.day].money_p); 
+  mvwprintw(win,23,1," 移動日数 : %6d",p.calender[p.day].move_day); 
 }
 
 int main(void){
@@ -128,7 +166,9 @@ int main(void){
   
   set(p);
   setlocale(LC_ALL,"");
-    
+
+  p[0].day = 5;
+  
   /* 初期化 */
   initscr();
   
@@ -136,12 +176,15 @@ int main(void){
   noecho();
   cbreak();
 
+  //sprintf(p[0].name,"えざわさぶじろう");
+  sprintf(p[0].name,"Shimizu_tatsuya");
+  
   /* 全体ウィンドウ作成 */
-  win = newwin(LINES,COLS-1,0,0);
+  win = newwin(35,100,0,0);
   box(win,'|','-');
-  sprintf(str,"%sの夏休み",p[i].name);
-  mvwaddstr(win,1,(COLS-1)/2,str);
- 
+  sprintf(str,"[ %sの夏休み ]",p[0].name);
+  mvwaddstr(win,1,45-strlen(p[0].name)/2,str);
+
   /* カレンダーウィンドウ作成 */
   cal = subwin(win,25,50,2,0);
   box(cal,'|','-');
@@ -149,16 +192,17 @@ int main(void){
   wrefresh(cal);
 
   /* イベントウィンドウ作成 */
-  ive = subwin(win,25,49,2,50);
+  ive = subwin(win,25,50,2,50);
   box(ive,'|','-');
-  //create_ive(ive,y,x);
+  create_ive(ive,1,1,p[0]);
+  wrefresh(ive);
 
   /* プレイヤー情報ウィンドウ作成 */
-  info = subwin(win,8,99,27,0);
+  info = subwin(win,8,100,27,0);
   box(info,'|','-');
   create_info(info,1,1,p);
   wrefresh(info);
-    
+  
   /* メッセージ描画 */
    
   while((c = wgetch(win)) != 0x1b){
