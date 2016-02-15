@@ -3,8 +3,8 @@ CC=gcc
 LFLAGS=-lncursesw
 CFLAGS=
 
-PROGRAM=test_window
-OBJS=test_window.o
+PROGRAM=test_window2
+OBJS=test_window2.o
 
 all: $(PROGRAM) sample_win
 
